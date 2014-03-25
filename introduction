@@ -4,7 +4,8 @@ divideXML 包下面的  FileProcess 类的 217行  和287行的  那2个  main�
 217行的是把一个  大的  xml文件  分割成小的xml，然后做索引
 287行的那个是    直接对已经分割好的  小的  xml  做索引
 
-lucene包下面的  IndexCreateProcess  里面的startElement 和endElement  是父类里面的，具体的你可以看一下文档，
+lucene包下面的  IndexCreateProcess  
+里面的startElement 和endElement  是父类里面的，具体的你可以看一下文档，
 
 IndexSearchProcess里面搜索的时候，我做的是对 全部field 做搜索，
 也就是，只要某个文档出现过 一个 词语就可以找到，不管是在 什么元素中出现的。

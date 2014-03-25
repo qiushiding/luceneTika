@@ -7,7 +7,7 @@
  * 描述：账号Service类
  * 
  */
-package saxAPI;
+package backup;
 
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
@@ -34,13 +34,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 // From chapter 7
-public class WikiTest extends DefaultHandler {
+public class SaxTest extends DefaultHandler {
 
 	private StringBuilder elementBuffer = new StringBuilder();
 	private Map<String, String> attributeMap = new HashMap<String, String>();
 
 	private Document doc;
-	IndexWriter writer=null;
+	IndexWriter writer = null;
 
 	public Document getDocument(InputStream is) // #1
 			throws DocumentHandlerException {
@@ -55,14 +55,12 @@ public class WikiTest extends DefaultHandler {
 		return doc;
 	}
 
-	
 	public void startDocument() {
 		doc = new Document();
 	}
 
-	
-	public void startElement(String uri, String localName,
-			String qName, Attributes atts) throws SAXException {
+	public void startElement(String uri, String localName, String qName,
+			Attributes atts) throws SAXException {
 
 		elementBuffer.setLength(0);
 		attributeMap.clear();
@@ -74,12 +72,10 @@ public class WikiTest extends DefaultHandler {
 		}
 	}
 
-	
 	public void characters(char[] text, int start, int length) { // #4
 		elementBuffer.append(text, start, length);
 	}
 
-	
 	public void endElement(String uri, String localName, String qName) // #5
 			throws SAXException {
 		if (qName.equals("us-patent-grant")) {
@@ -97,27 +93,16 @@ public class WikiTest extends DefaultHandler {
 		}
 	}
 
-	public void addToIndex(File xmlFile){
+	public void addToIndex(File xmlFile) {
 	}
-	
-	//生成indexWriter
-	public IndexWriter getWriter(String path) throws Exception{
-		Directory dir=FSDirectory.open(new File(path));
-		IndexWriterConfig iwConfig=new IndexWriterConfig(Version.LUCENE_36,
+
+	// 生成indexWriter
+	public IndexWriter getWriter(String path) throws Exception {
+		Directory dir = FSDirectory.open(new File(path));
+		IndexWriterConfig iwConfig = new IndexWriterConfig(Version.LUCENE_36,
 				new StandardAnalyzer(Version.LUCENE_36));
-		IndexWriter iWriter=new IndexWriter(dir, iwConfig);
-		//dir  的关闭
+		IndexWriter iWriter = new IndexWriter(dir, iwConfig);
+		// dir 的关闭
 		return iWriter;
-	}
-
-	
-	public static void main(String args[]) throws Exception {
-		WikiTest handler = new WikiTest();
-		Document doc = handler.getDocument(new FileInputStream(new File(
-				"c:/USD0674577-20130122.XML")));
-//				"c:/addressbook-entry2.xml")));
-
-		// new FileInputStream(new File(args[0])));
-		System.out.println(doc);
 	}
 }

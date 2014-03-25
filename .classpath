@@ -3,6 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/lucene-ant-3.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-core-3.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.6.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/luceneTika/lib/lucene-core-3.6.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jdom-2.0.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/luceneTika/lib/jdom-2.0.5-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

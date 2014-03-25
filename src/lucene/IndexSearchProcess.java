@@ -16,6 +16,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -56,55 +57,49 @@ public class IndexSearchProcess {
 	}
 	
 	//搜索
-	public void search(String word) throws IOException{
-		Term t=new Term("mark", "国");
+	public void search(String field, String word) throws IOException{
+		QueryParser queryParser = new QueryParser
+				(Version.LUCENE_36, field , new StandardAnalyzer(Version.LUCENE_36));
+		Term t=new Term(field, word);
 		Query q=new TermQuery(t);
-		TopDocs td=is.search(q, 5);
-		ScoreDoc [] sd=td.scoreDocs;
-//		if(sd!=null){
-		int l=sd.length;
-		System.out.println("共有"+td.totalHits);
-		System.out.println("共有"+l+"条记录");
-		Document doc=null;
-		Fieldable fieldable =null;  
-		if(l>0){
-			for (int i=0;i<l;i++){
-				//getFields() 
-				List listFields=doc.getFields();
-				Object [] objectFields=listFields.toArray();
-				System.out.println("通过函数 getFields()  得到的结果:");
-				for (int k=0;k<objectFields.length;k++){
-					System.out.println(objectFields[k].toString()+" 转化后  "+((Fieldable)objectFields[k]).stringValue());
-				}
-				System.out.println("\n----------------");
+		TopDocs topDocs=is.search(q, 100000000);
+		ScoreDoc[] scoreDocs=topDocs.scoreDocs;
+		int scoreDocsLength=scoreDocs.length;
+		System.out.println("共有"+topDocs.totalHits);
+		System.out.println("共有"+scoreDocsLength+"条记录");
+		
+		if (scoreDocs != null){
+			for (ScoreDoc sdTemp : scoreDocs){
+				Document docTemp = ir.document ( sdTemp.doc );
+				System.out.println(docTemp.get("fileName"));
 			}
 		}
-		else{
-			System.out.println("未找到相关记录");
-		}
 		this.closeAll();
-	}
-	
-	public void closeAll(){
-		try {
-			if ( id != null)
-				id.close();
-			if ( ir != null )
-				ir.close();
-
-			if ( is != null )
-				is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+		
+//		Document doc=null;
+//		Fieldable fieldable =null;
+//		if(scoreDocsLength > 0){
+//			for (int i=0;i<scoreDocsLength;i++){
+//				List listFields=doc.getFields();
+//				Object [] objectFields=listFields.toArray();
+//				System.out.println("通过函数 getFields()  得到的结果:");
+//				for (int k=0;k<objectFields.length;k++){
+//					System.out.println(objectFields[k].toString()+" 转化后  "+((Fieldable)objectFields[k]).stringValue());
+//				}
+//				System.out.println("\n----------------");
+//			}
+//		}
+//		else{
+//			System.out.println("未找到相关记录");
+//		}
+//		this.closeAll();
 	}
 	
 	/**
 	 * 多field搜索
-	 * @throws ParseException 
-	 * @throws IOException 
 	 */
-	public void multiFieldSearch(String [] fieldsForSearch ,String wordForSearch ) throws ParseException, IOException {
+	public void searchInMultiFields(String [] fieldsForSearch ,String wordForSearch ) throws ParseException, IOException {
 		MultiFieldQueryParser multiFieldQueryParser= new MultiFieldQueryParser
 			(Version.LUCENE_36, fieldsForSearch , new StandardAnalyzer(Version.LUCENE_36));
 		Query query = multiFieldQueryParser.parse( wordForSearch );
@@ -132,14 +127,13 @@ public class IndexSearchProcess {
 //				System.out.println("\n----------------");
 //			}
 //		}
-		ScoreDoc [] sd = topDocs.scoreDocs;
-		if ( sd != null){
-			for ( ScoreDoc sdTemp : sd ){
+		ScoreDoc [] scoreDocs = topDocs.scoreDocs;
+		if ( scoreDocs != null){
+			for ( ScoreDoc sdTemp : scoreDocs ){
 				Document docTemp = ir.document ( sdTemp.doc );
 				System.out.println( docTemp.get("fileName" ));
 			}
 		}
-		
 		this.closeAll();
 	}
 	
@@ -150,9 +144,10 @@ public class IndexSearchProcess {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public void allFieldsSearch ( String wordForSearch ) throws ParseException, IOException{
-		this.multiFieldSearch( this.listFieldName() ,wordForSearch );
+	public void searchInAllFields ( String wordForSearch ) throws ParseException, IOException{
+		this.searchInMultiFields( this.listFieldName() ,wordForSearch );
 	}
+	
 	//分页查询
 //	public void searchInPages() throws IOException{
 //		Term t=new Term("mark", "国");
@@ -192,13 +187,17 @@ public class IndexSearchProcess {
 //		is.close();
 //	}
 	
+	public void closeAll(){
+		try {
+			if ( id != null)
+				id.close();
+			if ( ir != null )
+				ir.close();
 
-	
-	public static void main(String[] args) throws CorruptIndexException, IOException, ParseException {
-		IndexSearchProcess st=new IndexSearchProcess("F:\\百度云\\研究方向\\关键词抽取\\索引测试\\indexTest");
-//		st.search();
-//		st.searchInPages();
-		//st.allFieldsSearch("ornamental");
-		st.allFieldsSearch("us-patent-grant");
+			if ( is != null )
+				is.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
